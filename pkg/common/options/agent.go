@@ -13,6 +13,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"open-cluster-management.io/ocm/pkg/registration/register"
 )
 
@@ -68,6 +69,7 @@ func (o *AgentOptions) SpokeKubeConfig(managedRestConfig *rest.Config) (*rest.Co
 	if o.SpokeKubeconfigFile == "" {
 		managedRestConfig.QPS = o.CommonOpts.QPS
 		managedRestConfig.Burst = o.CommonOpts.Burst
+		managedRestConfig.Transport = otelhttp.NewTransport(managedRestConfig.Transport)
 		return managedRestConfig, nil
 	}
 
@@ -77,6 +79,7 @@ func (o *AgentOptions) SpokeKubeConfig(managedRestConfig *rest.Config) (*rest.Co
 	}
 	spokeRestConfig.QPS = o.CommonOpts.QPS
 	spokeRestConfig.Burst = o.CommonOpts.Burst
+	spokeRestConfig.Transport = otelhttp.NewTransport(spokeRestConfig.Transport)
 	return spokeRestConfig, nil
 }
 

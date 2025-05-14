@@ -24,7 +24,7 @@ func NewOptions() *Options {
 	opts := &Options{
 		QPS:        50,
 		Burst:      100,
-		EnableOtel: false,
+		EnableOtel: true,
 	}
 	return opts
 }
@@ -39,9 +39,7 @@ func (o *Options) startWithOptions(startFunc controllercmd.StartFunc) controller
 	return func(ctx context.Context, controllerContext *controllercmd.ControllerContext) error {
 		controllerContext.KubeConfig.QPS = o.QPS
 		controllerContext.KubeConfig.Burst = o.Burst
-		if o.EnableOtel {
-			controllerContext.KubeConfig.Transport = otelhttp.NewTransport(controllerContext.KubeConfig.Transport)
-		}
+		controllerContext.KubeConfig.Transport = otelhttp.NewTransport(controllerContext.KubeConfig.Transport)
 		return startFunc(ctx, controllerContext)
 	}
 }
